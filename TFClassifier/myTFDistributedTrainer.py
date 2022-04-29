@@ -12,7 +12,8 @@ import time
 import os
 print(tf.__version__)
 
-from TFClassifier.Datasetutil.TFdatasetutil import loadTFdataset #loadtfds, loadkerasdataset, loadimagefolderdataset
+from TFClassifier.Datasetutil.TFdatasetutil import loadTFdataset,loadkerasdataset,loadimagefolderdataset
+from TFClassifier.Datasetutil.TFdatasetutil import loadtfds#loadtfds, loadkerasdataset, loadimagefolderdataset
 from TFClassifier.myTFmodels.CNNsimplemodels import createCNNsimplemodel
 
 model = None 
@@ -142,10 +143,10 @@ def main():
         BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
 
-    train_ds, val_ds, class_names, imageshape = loadTFdataset(args.data_name, args.data_type)
+    train_ds, val_ds, class_names, imageshape = loadTFdataset('fashionMNIST', args.data_type)
     #train_ds, test_data, num_train_examples, num_test_examples, class_names=loadimagefolderdataset('flower')
-    #train_data, test_data, num_train_examples, num_test_examples =loadkerasdataset('cifar10')
-    #train_data, test_data, num_train_examples, num_test_examples = loadtfds(args.tfds_dataname)
+    #train_ds, val_ds, num_train_examples, num_test_examples,class_names,imageshape =loadkerasdataset('fashionMNIST')
+    #train_data, test_data, num_train_examples, num_test_examples = loadtfds('tf_flowers')
 
     # train_data, test_data, num_train_examples, num_test_examples = loadtfds(
     #     args.tfds_dataname)
@@ -192,9 +193,23 @@ def main():
     print("TRAINING TIME: ", time.time() - start_time, " sec")
 
     plot_history(history, metricname, valmetricname)
+    hi='./outputs/fashions/tfrest/'
+    version = 1
+    export_path = os.path.join(hi, str(version))
 
     #Export the graph and the variables to the platform-agnostic SavedModel format. After your model is saved, you can load it with or without the scope.
     model.save(args.save_path, save_format='tf')
+    
+    tf.keras.models.save_model(
+    model,
+    export_path,
+    overwrite=True,
+    include_optimizer=True,
+    save_format=None,
+    signatures=None,
+    options=None
+    )
+    print("Done!!!!!! Saved to -->  ",hi)
 
     eval_loss, eval_acc = model.evaluate(val_ds)
     print('Eval loss: {}, Eval Accuracy: {}'.format(eval_loss, eval_acc))

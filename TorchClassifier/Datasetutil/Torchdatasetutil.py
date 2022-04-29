@@ -120,6 +120,10 @@ def loadTorchdataset(name, type, path, img_height=180, img_width=180, batch_size
     global IMG_height, IMG_width
     IMG_height = img_height
     IMG_width = img_width
+    print('name',name)
+    print('type',type)
+    print('path',path)
+    print('IMG_height',IMG_height)
 
     mydata_transforms = dataargumation()
 
@@ -190,7 +194,7 @@ def loadimagefoldertraintestdataset(name, path, split=['train', 'test']):
 
     class_names = train_data.classes
 
-    visbatchimage(images, labels, class_names)
+    #visbatchimage(images, labels, class_names)
 
     dataloaders = {'train': train_loader,
                     'val': valid_loader, 'test': test_loader}
@@ -308,7 +312,7 @@ def loadtorchvisiondataset(name, path):
     images, labels = dataiter.next()
     imagetensorshape = list(images.shape)  # torch.Size to python list
 
-    visbatchimage(images, labels, class_names)
+    #visbatchimage(images, labels, class_names)
 
     dataloaders = {'train': train_loader,
                     'val': valid_loader, 'test': test_loader}

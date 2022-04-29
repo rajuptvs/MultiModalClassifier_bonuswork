@@ -7,6 +7,7 @@ import numpy as np
 #from Datasetutil.Visutil import Visutil
 from TFClassifier.Datasetutil.Visutil import plot25images, plot9imagesfromtfdataset
 from TFClassifier.Datasetutil.TFdatacustompipeline import loadTFcustomdataset
+from tensorflow.keras.datasets import fashion_mnist
 AUTO = tf.data.experimental.AUTOTUNE
 
 BATCH_SIZE = 32
@@ -83,7 +84,7 @@ def loadkerasdataset(name='fashionMNIST'):
         print("This dataset is not supported:", name)
         exit()
 
-    (train_images, train_labels), (test_images, test_labels) = kerasdata.load_data()
+    (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
     #60000, 28, 28,  The images are 28x28 NumPy arrays, with pixel values ranging from 0 to 255
     #(60000,) The labels are an array of integers, ranging from 0 to 9
 
@@ -149,7 +150,7 @@ def random_crop(images, labels):
 
 
 #/home/lkk/.keras/datasets/cats_and_dogs_filtered, /home/lkk/.keras/datasets/flower_photos
-def loadimagefolderdataset(name, imagefolderpath='~/.keras/datasets/flower_photos', imageformat='jpg', img_height=180, img_width=180, batch_size=32):
+def loadimagefolderdataset(name, imagefolderpath='D:/pyenv/.keras/datasets/flower_photos', imageformat='jpg', img_height=180, img_width=180, batch_size=32):
     import pathlib
     data_dir = pathlib.Path(imagefolderpath)
     if imageformat=='jpg' or imageformat=='png':

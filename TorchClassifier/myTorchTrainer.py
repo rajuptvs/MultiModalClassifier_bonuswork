@@ -20,7 +20,7 @@ import PIL.Image
 print(torch.__version__)
 
 from TorchClassifier.Datasetutil.Visutil import imshow, vistestresult
-from TorchClassifier.Datasetutil.Torchdatasetutil import loadTorchdataset
+from TorchClassifier.Datasetutil.Torchdatasetutil import loadTorchdataset 
 from TorchClassifier.myTorchModels.TorchCNNmodels import createTorchCNNmodel
 from TorchClassifier.myTorchModels.TorchOptim import gettorchoptim
 from TorchClassifier.myTorchModels.TorchLearningratescheduler import setupLearningratescheduler
@@ -47,17 +47,24 @@ parser.add_argument('--img_width', type=int, default=28,
 parser.add_argument('--save_path', type=str, default='./outputs/',
                     help='path to save the model')
 # network
-parser.add_argument('--model_name', default='alexnet', choices=['mlpmodel1', 'lenet', 'alexnet', 'resnetmodel1', 'customresnet', 'vggmodel1', 'vggcustom', 'cnnmodel1'],
+#parser.add_argument('--model_name', default='alexnet', choices=['mlpmodel1', 'lenet', 'alexnet', 'resnetmodel1', 'customresnet', 'vggmodel1', 'vggcustom', 'cnnmodel1'],
+ #                   help='the network')
+#change in config (usage of SGD to Adam)
+parser.add_argument('--model_name', default='cnnmodel1', choices=['mlpmodel1', 'lenet', 'alexnet', 'resnetmodel1', 'customresnet', 'vggmodel1', 'vggcustom', 'cnnmodel1'],
                     help='the network')
 parser.add_argument('--arch', default='Pytorch', choices=['Tensorflow', 'Pytorch'],
                     help='Model Name, default: Pytorch.')
+
 parser.add_argument('--learningratename', default='StepLR', choices=['StepLR', 'ExponentialLR', 'MultiStepLR', 'OneCycleLR'],
                     help='learning rate name')
+#parser.add_argument('--optimizer', default='Adam', choices=['SGD', 'Adam', 'adamresnetcustomrate'],
+#                    help='select the optimizer')
+#change in config (usage of SGD to Adam)
 parser.add_argument('--optimizer', default='Adam', choices=['SGD', 'Adam', 'adamresnetcustomrate'],
                     help='select the optimizer')
 parser.add_argument('--batchsize', type=int, default=32,
                     help='batch size')
-parser.add_argument('--epochs', type=int, default=15,
+parser.add_argument('--epochs', type=int, default=10,
                     help='epochs')
 parser.add_argument('--GPU', type=bool, default=True,
                     help='use GPU')
@@ -74,9 +81,8 @@ parser.add_argument('--reproducible', type=bool, default=False,
 args = parser.parse_args()
 
 
-def train_model(model, dataloaders, dataset_sizes, criterion, optimizer, scheduler, num_epochs=25):
+def train_model(model, dataloaders, dataset_sizes, criterion, optimizer,num_epochs=25):
     since = time.time()
-
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
@@ -124,8 +130,9 @@ def train_model(model, dataloaders, dataset_sizes, criterion, optimizer, schedul
                 # statistics
                 running_loss += loss.item() * inputs.size(0)#batch size
                 running_corrects += torch.sum(preds == labels.data)
-            if phase == 'train':
-                scheduler.step()
+            #if phase == 'train':
+            #    print('Scheduler',scheduler)
+            #    scheduler.step()
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
@@ -179,6 +186,7 @@ def visualize_model(model, dataloaders, class_names, num_images=6):
         model.train(mode=was_training)
 
 def main():
+    print('args.model_name',args.model_name)
     print("Torch Version: ", torch.__version__)
     print("Torchvision Version: ", torchvision.__version__)
 
@@ -215,9 +223,14 @@ def main():
         print("No GPU and TPU enabled")
     
     #Load dataset
-    dataloaders, dataset_sizes, class_names, img_shape = loadTorchdataset(args.data_name,args.data_type, args.data_path, args.img_height, args.img_width, args.batchsize)
+    print('args.data_name',args.data_name)
+    print('args.data_type',args.data_type)
+    print('args.data_path',args.data_path)
+    
+    dataloaders, dataset_sizes, class_names, img_shape = loadTorchdataset(args.data_name,args.data_type, args.data_path)
 
     numclasses =len(class_names)
+    
     model_ft = createTorchCNNmodel(args.model_name, numclasses, img_shape)
 
     criterion = nn.CrossEntropyLoss()
@@ -227,15 +240,18 @@ def main():
 
     # Observe that all parameters are being optimized, 
     optimizer_ft=gettorchoptim(args.optimizer, model_ft) #'Adam'
-    # optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
+    #optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
     # optimizer_ft = optim.Adam(model_ft.parameters())
 
     # # Decay LR by a factor of 0.1 every 7 epochs
     # exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
     STEPS_PER_EPOCH = len(dataloaders['train'])
     lr_scheduler = setupLearningratescheduler(args.learningratename, optimizer_ft, args.epochs, STEPS_PER_EPOCH)
-
-    model_ft = train_model(model_ft, dataloaders, dataset_sizes, criterion, optimizer_ft, lr_scheduler,
+    #print('args_learningrate',args.learningratename)
+    #print('scheduler_lr',lr_scheduler)
+    #schedulers = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+    #print('schedulers',scheduler)
+    model_ft = train_model(model_ft, dataloaders, dataset_sizes, criterion, optimizer_ft,
                        num_epochs=args.epochs)
 
     #save torch model

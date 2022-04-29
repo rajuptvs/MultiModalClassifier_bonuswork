@@ -23,7 +23,7 @@ import configargparse
 #import logger
 
 parser = configargparse.ArgParser(description='myTFClassify')
-parser.add_argument('--data_path', type=str, default='/home/kaikai/.keras/datasets/flower_photos',
+parser.add_argument('--data_path', type=str, default='D:/pyenv/.keras/datasets/flower_photos',
                     help='path to get data')
 parser.add_argument('--save_path', type=str, default='./logs',
                     help='path to save the model and logs')
@@ -53,7 +53,7 @@ numclasses = 5
 
 
 def lrfn(epoch):
-    def lr(epoch, start_lr, min_lr, max_lr, rampup_epochs, sustain_epochs, exp_decay):
+    def lr(epoch, start_lr=0.01, min_lr, max_lr, rampup_epochs, sustain_epochs, exp_decay):
         if epoch < rampup_epochs:
             lr = (max_lr - start_lr)/rampup_epochs * epoch + start_lr
         elif epoch < rampup_epochs + sustain_epochs:
@@ -142,7 +142,7 @@ def process_folderpath(file_path):
 def configure_for_performance(ds):
     ds = ds.cache()
     ds = ds.shuffle(buffer_size=1000)
-    ds = ds.batch(batch_size)
+    ds = ds.batch(batch_size=16)
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds
 
@@ -242,6 +242,7 @@ def main():
     # log = logger.setup_logger(os.path.join(args.save_path, 'test.log'))
     # for key, value in sorted(vars(args).items()):
     #     log.info(str(key) + ': ' + str(value))
+    print("path",args.data_path)
 
     if args.arch == 'Tensorflow':
         import tensorflow as tf
@@ -375,11 +376,9 @@ def main():
 
         lr_callback = tf.keras.callbacks.LearningRateScheduler(
             lambda epoch: lrfn(epoch), verbose=True)
-
-        rng = [i for i in range(EPOCHS)]
-        y = [lrfn(x) for x in rng]
-        plt.plot(rng, [lrfn(x) for x in rng])
-        print(y[0], y[-1])
+        
+        
+     
 
         with strategy.scope():  # creating the model in the TPUStrategy scope places the model on the TPU
             model = create_model2()
@@ -388,6 +387,10 @@ def main():
 
         start_time = time.time()
         EPOCHS = 30
+        rng = [i for i in range(EPOCHS)]
+        y = [lrfn(x) for x in rng]
+        plt.plot(rng, [lrfn(x) for x in rng])
+        print(y[0], y[-1])
         TRAIN_STEPS = 2936 // BATCH_SIZE  # 2936 is the length of train data
         # history = model.fit(train_ds, validation_data=val_ds,
         #                     steps_per_epoch=TRAIN_STEPS, epochs=EPOCHS, callbacks=[lr_callback])

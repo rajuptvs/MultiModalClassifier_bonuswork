@@ -31,7 +31,7 @@ device = None
 # import logger
 
 parser = configargparse.ArgParser(description='myTorchClassify')
-parser.add_argument('--data_name', type=str, default='MNIST',
+parser.add_argument('--data_name', type=str, default='CIFAR10',
                     help='data name: hymenoptera_data, CIFAR10, flower_photos')
 parser.add_argument('--data_type', default='torchvisiondataset', choices=['trainvalfolder', 'traintestfolder', 'torchvisiondataset'],
                     help='the type of data') 
@@ -44,7 +44,7 @@ parser.add_argument('--img_width', type=int, default=28,
 parser.add_argument('--save_path', type=str, default='./outputs/',
                     help='path to save the model')
 # network
-parser.add_argument('--model_name', default='lenet', choices=['mlpmodel1', 'lenet', 'resnetmodel1', 'vggmodel1', 'cnnmodel1'],
+parser.add_argument('--model_name', default='cnnmodel1', choices=['mlpmodel1', 'lenet', 'resnetmodel1', 'vggmodel1', 'cnnmodel1'],
                     help='the network')
 parser.add_argument('--arch', default='Pytorch', choices=['Tensorflow', 'Pytorch'],
                     help='Model Name, default: Pytorch.')

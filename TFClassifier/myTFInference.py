@@ -15,7 +15,7 @@ parser.add_argument('--data_name', type=str, default='flower',
                     help='data name: mnist, fashionMNIST, flower')
 parser.add_argument('--data_type', default='imagefolder', choices=['tfds', 'kerasdataset', 'imagefolder', 'TFrecord'],
                     help='the type of data')  # gs://cmpelkk_imagetest/*.tfrec
-parser.add_argument('--data_path', type=str, default='/home/lkk/.keras/datasets/flower_photos',
+parser.add_argument('--data_path', type=str, default='D:/pyenv/.keras/datasets/flower_photos',
                     help='path to get data')
 parser.add_argument('--img_height', type=int, default=180,
                     help='resize to img height')
@@ -24,7 +24,7 @@ parser.add_argument('--img_width', type=int, default=180,
 # network
 parser.add_argument('--model_name', default='cnnsimple4', choices=['cnnsimple1', 'cnnsimple2', 'cnnsimple3', 'cnnsimple4','mobilenetmodel1'],
                     help='the network')
-parser.add_argument('--model_path', type=str, default='./outputs/flower_mobilenetmodel1_0630',
+parser.add_argument('--model_path', type=str, default='D:/pyenv/MultiModalClassifier_bonuswork/TFClassifier/outputs/fashion',
                     help='Model path.')
 parser.add_argument('--GPU', type=bool, default=True,
                     help='use GPU')
@@ -108,7 +108,7 @@ def inference(infermodel, img_np, class_names):
 
 def main():
 
-    model=loadsavedmodel(args.model_path)
+    model=loadsavedmodel('')
 
     url='https://www.jacksonandperkins.com/images/xxl/v1780.jpg'#rose
     img_array = PILgetonlineimagearray(url, args.img_height, args.img_width)

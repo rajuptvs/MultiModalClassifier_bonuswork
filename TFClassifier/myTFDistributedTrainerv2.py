@@ -8,8 +8,9 @@ import time
 import os
 print(tf.__version__)
 
-from TFClassifier.Datasetutil.TFdatasetutil import loadTFdataset #loadtfds, loadkerasdataset, loadimagefolderdataset
+from TFClassifier.Datasetutil.TFdatasetutil import loadTFdataset,loadimagefolderdataset,loadkerasdataset #loadtfds, loadkerasdataset, loadimagefolderdataset
 from TFClassifier.myTFmodels.CNNsimplemodels import createCNNsimplemodel
+from TFClassifier.Datasetutil.TFdatasetutil import loadtfds
 from TFClassifier.Datasetutil.Visutil import plot25images, plot9imagesfromtfdataset, plot_history
 from TFClassifier.myTFmodels.optimizer_factory import build_learning_rate, setupTensorboardWriterforLR
 
@@ -17,26 +18,26 @@ model = None
 # import logger
 
 parser = configargparse.ArgParser(description='myTFDistributedClassify')
-parser.add_argument('--data_name', type=str, default='flower',
+parser.add_argument('--data_name', type=str, default='fashionMNIST',
                     help='data name: mnist, fashionMNIST, flower')
-parser.add_argument('--data_type', default='customtfrecordfile', choices=['tfds', 'kerasdataset', 'imagefolder', 'customtfrecordfile'],
+parser.add_argument('--data_type', default='kerasdataset', choices=['tfds', 'kerasdataset', 'imagefolder', 'customtfrecordfile'],
                     help='the type of data')  # gs://cmpelkk_imagetest/*.tfrec
-parser.add_argument('--data_path', type=str, default='/home/lkk/Developer/MyRepo/MultiModalClassifier/outputs/TFrecord',
+parser.add_argument('--data_path', type=str, default='D:/pyenv/MultiModalClassifier_bonuswork/ImageClassificationData',
                     help='path to get data') #'/home/lkk/.keras/datasets/flower_photos'
 parser.add_argument('--img_height', type=int, default=180,
                     help='resize to img height')
 parser.add_argument('--img_width', type=int, default=180,
                     help='resize to img width')
-parser.add_argument('--save_path', type=str, default='./outputs/',
+parser.add_argument('--save_path', type=str, default='./outputs/fashion/',
                     help='path to save the model')
 # network
-parser.add_argument('--model_name', default='xceptionmodel1', choices=['cnnsimple1', 'cnnsimple2', 'cnnsimple3', 'cnnsimple4','mobilenetmodel1', 'xceptionmodel1'],
+parser.add_argument('--model_name', default='cnnsimple3', choices=['cnnsimple1', 'cnnsimple2', 'cnnsimple3', 'cnnsimple4','mobilenetmodel1', 'xceptionmodel1'],
                     help='the network')
 parser.add_argument('--arch', default='Tensorflow', choices=['Tensorflow', 'Pytorch'],
                     help='Model Name, default: Tensorflow.')
 parser.add_argument('--learningratename', default='warmupexpdecay', choices=['fixedstep', 'fixed', 'warmupexpdecay'],
                     help='path to save the model')
-parser.add_argument('--batchsize', type=int, default=32,
+parser.add_argument('--batchsize', type=int, default=8,
                     help='batch size')
 parser.add_argument('--epochs', type=int, default=15,
                     help='epochs')
@@ -53,8 +54,11 @@ args = parser.parse_args()
 
 # Callback for printing the LR at the end of each epoch.
 class PrintLR(tf.keras.callbacks.Callback):
-  def on_epoch_end(self, epoch, logs=None):
-    print('\nLearning rate for epoch {} is {}'.format(epoch + 1,
+    
+    
+    def on_epoch_end(self, epoch, logs=None):
+              
+        print('\nLearning rate for epoch {} is {}'.format(epoch + 1,
                                                       model.optimizer.lr.numpy()))
 
 
@@ -64,7 +68,10 @@ def main():
 
     TAG="0712"
     args.save_path=args.save_path+args.data_name+'_'+args.model_name+'_'+TAG
+    
     print("Output path:", args.save_path)
+    print("Output path:", args.data_name)
+
 
     # mixed precision
     # On TPU, bfloat16/float32 mixed precision is automatically used in TPU computations.
@@ -108,10 +115,10 @@ def main():
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * strategy.num_replicas_in_sync
 
     #train_ds, val_ds, class_names, imageshape = loadTFdataset(args.data_name, args.data_type)
-    train_ds, val_ds, class_names, imageshape = loadTFdataset(args.data_name, args.data_type, args.data_path, args.img_height, args.img_width, BATCH_SIZE)
-    #train_ds, test_data, num_train_examples, num_test_examples, class_names=loadimagefolderdataset('flower')
-    #train_data, test_data, num_train_examples, num_test_examples =loadkerasdataset('cifar10')
-    #train_data, test_data, num_train_examples, num_test_examples = loadtfds(args.tfds_dataname)
+    #train_ds, val_ds, class_names, imageshape = loadTFdataset(args.data_name, args.data_type, args.data_path, args.img_height, args.img_width, BATCH_SIZE)
+    #train_ds, val_ds, class_names,imageshape=loadimagefolderdataset('tf_flowers')
+    train_ds, val_ds, num_train_examples, num_test_examples,class_names,imageshape =loadkerasdataset('fashionMNIST')
+    #train_data, test_data, num_train_examples, num_test_examples = loadtfds(args.data_name)
 
     # train_data, test_data, num_train_examples, num_test_examples = loadtfds(
     #     args.tfds_dataname)
@@ -134,6 +141,11 @@ def main():
     # Define the checkpoint directory to store the checkpoints
     checkpoint_dir = args.save_path #'./training_checkpoints'
     # Name of the checkpoint files
+    hi='./outputs/fashions/tfrest/'
+    version = 1
+ 
+    
+
     checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
 
     setupTensorboardWriterforLR(args.save_path)
@@ -163,12 +175,22 @@ def main():
     print("TRAINING TIME: ", time.time() - start_time, " sec")
 
     plot_history(history, metricname, valmetricname, args.save_path)
-
+    export_path = os.path.join(hi, str(version))
     #Export the graph and the variables to the platform-agnostic SavedModel format. After your model is saved, you can load it with or without the scope.
     model.save(args.save_path, save_format='tf')
+    tf.keras.models.save_model(
+    model,
+    export_path,
+    overwrite=True,
+    include_optimizer=True,
+    save_format=None,
+    signatures=None,
+    options=None
+    )
+    print("Done!!!!!! Saved to -->  ",hi)
 
     eval_loss, eval_acc = model.evaluate(val_ds)
     print('Eval loss: {}, Eval Accuracy: {}'.format(eval_loss, eval_acc))
-
+    
 if __name__ == '__main__':
     main()
