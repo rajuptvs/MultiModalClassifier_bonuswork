@@ -18,7 +18,7 @@
 ## Training Performance chart
 ![image](https://github.com/rajuptvs/MultiModalClassifier_bonuswork/blob/main/Performance.png?raw=true)
 
-## :
+## REST API
 ### Loadaing image from JSON (Fashion MNIST)
 
 ![image](https://github.com/rajuptvs/MultiModalClassifier_bonuswork/blob/main/sandal.jpg?raw=true)
