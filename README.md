@@ -1,3 +1,37 @@
+# Options Selected for Bonus Work:
+1) [TensorFlowLite](./TFClassifier/converted_model.tflite) Inference
+2) Serving with [REST API's](./RestAPI.ipynb) using TensorFlow
+
+# Steps Performed and Changes Made: 
+
+1) Created a new Virtual Environment.
+2) Installed libraries required using the setup.py and some other libraries to enable GPU and CUDA usage on Local Machine
+3) Changes have been made to both the PyTorch Classifier code and TensorFlow code, when issues occured while running the code
+4) Added extra code to accommodate the REST API's
+5) Created a separate notebook in Google Colab for the serving of REST API and showing predictions from json file and displaying the output
+
+# Screenshots 
+
+## Display of Image Batch
+![image](https://github.com/rajuptvs/MultiModalClassifier_bonuswork/blob/main/25images.png?raw=true)
+
+## Training Performance chart
+![image](https://github.com/rajuptvs/MultiModalClassifier_bonuswork/blob/main/Performance.png?raw=true)
+
+## :
+### Loadaing image from JSON (Fashion MNIST)
+
+![image](https://github.com/rajuptvs/MultiModalClassifier_bonuswork/blob/main/sandal.jpg?raw=true)
+
+### Prediction of image from JSON (Fashion MNIST)
+
+![image](https://github.com/rajuptvs/MultiModalClassifier_bonuswork/blob/main/REST%20API.jpg?raw=true)
+
+
+
+
+
+
 # MultiModalClassifier
 This is a project repo for multi-modal deep learning classifier with popular models from Tensorflow and Pytorch. The goal of these baseline models is to provide a template to build on and can be a starting point for any new ideas, applications. If you want to learn basics of ML and DL, please refer this repo: https://github.com/lkk688/DeepDataMiningLearning.
 
